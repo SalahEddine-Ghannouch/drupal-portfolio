@@ -116,28 +116,6 @@
   // Apply saved/detected language on load.
   applyI18n(currentLang);
 
-  /* ---------- Theme toggle (persisted) ---------- */
-  const root = document.documentElement;
-  const themeToggle = $('#themeToggle');
-  const storedTheme = localStorage.getItem('theme');
-  if (storedTheme) {
-    root.setAttribute('data-theme', storedTheme);
-  } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-    root.setAttribute('data-theme', 'light');
-  }
-  const syncTogglePressed = () => {
-    if (themeToggle) themeToggle.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'dark'));
-  };
-  syncTogglePressed();
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      root.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
-      syncTogglePressed();
-    });
-  }
-
   /* ---------- Sticky navbar frosted on scroll ---------- */
   const navbar = $('#navbar');
   const onScroll = () => {
@@ -220,14 +198,18 @@
   const setActive = (id) => {
     navAnchors.forEach((a) => a.classList.toggle('active', a.getAttribute('href') === '#' + id));
   };
-  if (sections.length && navAnchors.length && 'IntersectionObserver' in window) {
-    const spy = new IntersectionObserver((entries) => {
-      const visible = entries.filter((e) => e.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible) setActive(visible.target.id);
-    }, { threshold: [0.25, 0.5, 0.75], rootMargin: '-20% 0px -35% 0px' });
-    sections.forEach((s) => spy.observe(s));
-  }
+  // Scroll-position approach: reliable for all section heights (no threshold issues).
+  const updateActive = () => {
+    // Consider a section "active" once its top edge passes 30 % from the top of the viewport.
+    const trigger = window.scrollY + window.innerHeight * 0.30;
+    let current = null;
+    sections.forEach((s) => {
+      if (s.offsetTop <= trigger) current = s.id;
+    });
+    if (current) setActive(current);
+  };
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive(); // run once on load
   // Immediate feedback on click (esp. mobile, before scroll settles).
   navAnchors.forEach((a) => a.addEventListener('click', () => {
     setActive(a.getAttribute('href').slice(1));
