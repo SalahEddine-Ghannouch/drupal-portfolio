@@ -87,6 +87,9 @@ window.I18N = {
     'proj3.problem': 'Develop CDG Dev\'s website with a structured interface for subsidiaries, business lines, projects, and publications.',
     'proj3.solution': 'Drupal 9/10 back end with Next.js front end and Twig-templated views. Security hardened to Drupal 10 compliance.',
     'proj3.result': 'Drupal 9/10 · PHP · Next.js · Twig · ETL Migration',
+    'proj4.title': 'INWI – Dir Iddik',
+    'proj4.problem': 'Need for a decision dashboard to track volunteer, ambassador, and user activity across the Dir Iddik platform.',
+    'proj4.solution': 'Designed and built a decision dashboard with key statistics and KPIs through dynamic charts. Implemented Grafana monitoring to track system performance and availability.',
 
     /* experience */
     'exp.title': 'Experience',
@@ -213,6 +216,9 @@ window.I18N = {
     'proj3.problem': "Développement du site web de CDG Dév avec une interface pour la gestion des filiales, des métiers, des projets et des publications.",
     'proj3.solution': "Back-end Drupal 9/10 avec front-end Next.js et vues Twig. Renforcement de la sécurité en conformité Drupal 10.",
     'proj3.result': 'Drupal 9/10 · PHP · Next.js · Twig · Migration ETL',
+    'proj4.title': 'INWI – Dir Iddik',
+    'proj4.problem': "Besoin d'un tableau de bord décisionnel pour suivre l'activité des bénévoles, ambassadeurs et utilisateurs de la plateforme Dir Iddik.",
+    'proj4.solution': "Conception et développement d'un dashboard avec statistiques et indicateurs clés via graphiques dynamiques. Mise en place d'une solution de monitoring Grafana pour le suivi des performances et de la disponibilité.",
 
     /* experience */
     'exp.title': 'Expérience',

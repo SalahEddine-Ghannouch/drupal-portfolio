@@ -326,6 +326,7 @@ ul { list-style: none; padding: 0; }
 .thumb-1 { background: linear-gradient(135deg, #0a2a52, #0678BE 60%, #00B4D8); }
 .thumb-2 { background: linear-gradient(135deg, #06243f, #2a6cf0 55%, #00B4D8); }
 .thumb-3 { background: linear-gradient(135deg, #0a2a52, #7b3ff2 55%, #00B4D8); }
+.thumb-4 { background: linear-gradient(135deg, #3d1a00, #e85d04 55%, #ffba08); }
 
 .browser-bar { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: rgba(3, 14, 30, .38); backdrop-filter: blur(4px); }
 .browser-dots { display: inline-flex; gap: 5px; flex: 0 0 auto; }
