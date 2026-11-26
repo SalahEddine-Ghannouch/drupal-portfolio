@@ -40,6 +40,34 @@
   const langLabel = $('#langLabel');
   const langToggle = $('#langToggle');
 
+  const safeRichHtml = (html) => {
+    const parsed = new DOMParser().parseFromString(String(html), 'text/html');
+    const output = document.createElement('div');
+    const allowed = new Set(['BR', 'EM', 'STRONG', 'SPAN']);
+    const copySafe = (source, target) => {
+      Array.from(source.childNodes).forEach((node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+          target.appendChild(document.createTextNode(node.textContent));
+          return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        if (!allowed.has(node.tagName)) {
+          copySafe(node, target);
+          return;
+        }
+        const element = document.createElement(node.tagName.toLowerCase());
+        const years = node.getAttribute('data-years-since');
+        if (node.tagName === 'SPAN' && /^\d{4}$/.test(years || '')) {
+          element.setAttribute('data-years-since', years);
+        }
+        copySafe(node, element);
+        target.appendChild(element);
+      });
+    };
+    copySafe(parsed.body, output);
+    return output.innerHTML;
+  };
+
   const applyI18n = (lang) => {
     const dict = I18N[lang] || I18N.en || {};
     document.documentElement.lang = lang;
@@ -52,7 +80,30 @@
     // Rich text nodes (may contain <strong>, the years span, etc.).
     $$('[data-i18n-html]').forEach((el) => {
       const key = el.getAttribute('data-i18n-html');
-      if (dict[key] != null) el.innerHTML = dict[key];
+      if (dict[key] != null) el.innerHTML = safeRichHtml(dict[key]);
+    });
+    $$('[data-i18n-list]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-list');
+      if (!Array.isArray(dict[key])) return;
+      el.replaceChildren(...dict[key].map((item) => {
+        const li = document.createElement('li');
+        li.textContent = String(item);
+        return li;
+      }));
+    });
+    $$('[data-i18n-href]').forEach((el) => {
+      const value = dict[el.getAttribute('data-i18n-href')];
+      if (typeof value === 'string' && /^(https?:\/\/|mailto:)/i.test(value.trim())) {
+        el.setAttribute('href', value.trim());
+      }
+    });
+    $$('[data-i18n-aria]').forEach((el) => {
+      const value = dict[el.getAttribute('data-i18n-aria')];
+      if (typeof value === 'string') el.setAttribute('aria-label', value);
+    });
+    $$('[data-i18n-content]').forEach((el) => {
+      const value = dict[el.getAttribute('data-i18n-content')];
+      if (typeof value === 'string') el.setAttribute('content', value);
     });
 
     // The toggle shows the OTHER language (what you'll switch to).
@@ -63,6 +114,7 @@
     updateYears();
     // Refresh rotator words for the active language.
     updateRotatorWords(lang);
+    window.dispatchEvent(new CustomEvent('portfolio:language-changed', { detail: { language: lang } }));
   };
 
   /* ---------- Rotating tagline (language-aware) ---------- */
@@ -115,6 +167,7 @@
 
   // Apply saved/detected language on load.
   applyI18n(currentLang);
+  window.addEventListener('portfolio:content-updated', () => applyI18n(currentLang));
 
   /* ---------- Sticky navbar frosted on scroll ---------- */
   const navbar = $('#navbar');
@@ -145,11 +198,19 @@
   }
 
   /* ---------- Scroll reveal (staggered) ---------- */
-  const revealEls = $$('.reveal');
-  if (prefersReduced || !('IntersectionObserver' in window)) {
-    revealEls.forEach((el) => el.classList.add('in'));
-  } else {
-    const io = new IntersectionObserver((entries, obs) => {
+  let revealObserver = null;
+  const revealElements = () => {
+    $$('.reveal').forEach((el) => {
+      if (el.classList.contains('in')) return;
+      if (prefersReduced || !revealObserver) {
+        el.classList.add('in');
+      } else {
+        revealObserver.observe(el);
+      }
+    });
+  };
+  if (!prefersReduced && 'IntersectionObserver' in window) {
+    revealObserver = new IntersectionObserver((entries, obs) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const el = entry.target;
@@ -161,8 +222,9 @@
         obs.unobserve(el);
       });
     }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
-    revealEls.forEach((el) => io.observe(el));
   }
+  revealElements();
+  window.addEventListener('portfolio:items-rendered', revealElements);
 
   /* ---------- Scroll to top ---------- */
   const toTop = $('#toTop');
