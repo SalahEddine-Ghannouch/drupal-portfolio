@@ -3,7 +3,7 @@
 A single-page, fully responsive **full-stack developer** portfolio for
 **Salah Eddine Ghannouch**, with a deep **specialization in Drupal** (which also
 inspired the Drupal-blue theme). Built with plain **HTML / CSS / JavaScript** —
-no build step, no dependencies. Just open `index.html`.
+no build step. Supabase is optional; the portfolio also runs on its local data.
 
 ## Features
 
@@ -20,6 +20,11 @@ no build step, no dependencies. Just open `index.html`.
 - **Accessibility**: semantic landmarks, skip link, keyboard nav, focus styles, `aria`
   attributes, and full **`prefers-reduced-motion`** support.
 - **Generated CV download** (localized EN/FR text file).
+- **Optional Supabase backoffice** at `/admin/` for EN/FR portfolio text and links.
+- **Admin MFA**: TOTP verification is required by the backoffice and database
+  policies.
+- **Portfolio entry management**: add, edit, publish, reorder, and delete projects,
+  expertise items, experience, open-source modules, certifications, and testimonials.
 
 ## Internationalization (EN / FR)
 
@@ -29,6 +34,8 @@ A lightweight, static-host-friendly mechanism — no framework required:
   `data-i18n-html="key"` (rich text) attribute.
 - All strings live in **`js/translations.js`** under `window.I18N.en` / `window.I18N.fr`
   (plus rotating-tagline words and the CV text per language).
+- When configured, Supabase overrides the local strings; local translations
+  remain the fallback if the database is unavailable.
 - **`js/main.js`** swaps the text on load and whenever the language toggle is clicked,
   sets `<html lang>`, and **remembers the choice in `localStorage`**. First-time visitors
   are auto-detected from their browser language (falls back to English).
@@ -49,16 +56,28 @@ xdg-open index.html
 python3 -m http.server 8000   # http://localhost:8000
 ```
 
-## Deploy to Hostinger
+## Supabase backoffice
 
-This is a static site, so deployment is drag-and-drop simple:
+Follow [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) to create the database,
+enable TOTP MFA, allowlist an admin account, configure the public project key,
+and publish the initial EN/FR content. The backoffice manages the portfolio
+text and the project, expertise, experience, open-source, certification, and
+testimonial entries. Section layout and styling remain code-managed.
 
-1. In **hPanel → Files → File Manager**, open your domain's `public_html` folder.
-2. Upload `index.html` and the `css/` and `js/` folders (keep the same structure).
-   - Or zip the project, upload the zip, and **Extract** it inside `public_html`.
-3. Visit your domain — done. (No Node/build needed; Google Fonts load over HTTPS.)
+## Deploy to Cloudflare Pages
 
-> Tip: keep `index.html` at the root of `public_html` so it's served as the homepage.
+This is a static site and requires no build command:
+
+1. Connect the repository in **Workers & Pages → Create → Pages**, or use
+   **Direct Upload**.
+2. Leave the build command empty and set the output directory to the project
+   root. Include `_headers`, `index.html`, `admin/`, `css/`, and `js/` in that
+   output directory.
+3. Add the custom domain in Cloudflare Pages and enable **Always Use HTTPS**.
+
+Cloudflare Pages applies the admin security headers from `_headers`. If the
+Supabase project uses a custom hostname instead of `*.supabase.co`, update the
+admin Content Security Policy before deploying.
 
 ## Structure
 
@@ -68,14 +87,19 @@ drupal-portfolio/
 ├── css/styles.css      # theme tokens, layout, animations
 ├── js/translations.js  # EN + FR strings, rotator words, CV text
 ├── js/main.js          # interactions (i18n, theme, rotator, reveals, CV)
+├── js/content.js       # optional Supabase content loading
+├── js/portfolio-items.js # safe rendering for database-backed entries
+├── _headers            # Cloudflare Pages security headers for /admin/
+├── admin/              # Supabase Auth backoffice
+├── supabase/migrations/ # database schema and row-level security
 └── README.md
 ```
 
 ## Customize
 
-- **Text / translations**: `js/translations.js` (both `en` and `fr`)
+- **Text / translations**: `/admin/` after Supabase setup, or `js/translations.js` locally
 - **Structure & tags**: `index.html`
 - **Colors, spacing, fonts**: CSS variables at the top of `css/styles.css`
 - **Start year for experience**: change `data-years-since="2023"` in `index.html`
 
-All content is realistic placeholder data — swap in your real projects and links.
+All portfolio strings have local EN/FR defaults in `js/translations.js`.

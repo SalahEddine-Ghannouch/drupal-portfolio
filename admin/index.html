@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co" />
+  <title>Portfolio Backoffice</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="../index.html">SG<span>.</span> <small>Portfolio backoffice</small></a>
+      <a class="back-link" href="../index.html">View portfolio ↗</a>
+    </header>
+
+    <section class="panel login-panel" id="loginPanel">
+      <p class="eyebrow">ADMINISTRATOR ACCESS</p>
+      <h1>Sign in</h1>
+      <p class="muted">Use the administrator account configured for this site.</p>
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" required />
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button class="primary-button" type="submit">Sign in</button>
+      </form>
+      <p class="notice" id="loginStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel mfa-panel" id="mfaPanel" hidden>
+      <p class="eyebrow">TWO-FACTOR AUTHENTICATION</p>
+      <h1 id="mfaTitle">Verify your identity</h1>
+      <p class="muted" id="mfaDescription"></p>
+      <div class="mfa-setup" id="mfaSetup" hidden>
+        <img id="mfaQrCode" alt="QR code for authenticator app setup" hidden />
+        <p>Scan the QR code with an authenticator app, or enter this setup key manually:</p>
+        <code id="mfaSecret"></code>
+      </div>
+      <form id="mfaForm">
+        <label for="mfaCode">6-digit authenticator code</label>
+        <input id="mfaCode" name="mfaCode" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" minlength="6" maxlength="6" required />
+        <button class="primary-button" id="mfaSubmitButton" type="submit">Verify code</button>
+        <button class="secondary-button" id="cancelMfaButton" type="button">Cancel sign in</button>
+      </form>
+      <p class="notice" id="mfaStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="workspace" id="workspace" hidden>
+      <div class="workspace-heading">
+        <div>
+          <p class="eyebrow">CONTENT</p>
+          <h1>Portfolio content</h1>
+          <p class="muted">Manage portfolio copy and add, edit, publish, reorder, or delete content entries.</p>
+        </div>
+        <div class="workspace-actions">
+          <span class="session-note">Automatic sign-out after 30 minutes of inactivity.</span>
+          <button class="secondary-button" id="signOutButton" type="button">
+            <span id="signOutLabel">Sign out</span>
+            <span class="button-spinner" id="signOutSpinner" aria-hidden="true" hidden></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="toolbar panel">
+        <label>
+          Language
+          <select id="languageSelect">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+        </label>
+        <label>
+          Search content
+          <input id="searchInput" type="search" placeholder="Search a field or its value" />
+        </label>
+        <div class="toolbar-actions">
+          <button class="secondary-button" id="restoreButton" type="button">Reset text to defaults</button>
+          <button class="primary-button" id="saveButton" type="button">Save all changes</button>
+        </div>
+        <small class="toolbar-hint">Resets built-in EN/FR text only; portfolio entries are not affected.</small>
+      </div>
+      <p class="notice" id="status" role="status" aria-live="polite"></p>
+      <div class="content-sections" id="contentSections"></div>
+      <div class="items-heading">
+        <div>
+          <p class="eyebrow">PORTFOLIO ENTRIES</p>
+          <h2>Manage entries</h2>
+        </div>
+      </div>
+      <div class="item-sections" id="itemSections"></div>
+      <p class="footnote">Save all changes to publish. The public portfolio keeps its local content if the database is unavailable.</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/translations.js"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/portfolio-items.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
